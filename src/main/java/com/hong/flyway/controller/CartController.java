@@ -2,7 +2,7 @@ package com.hong.flyway.controller;
 
 import java.util.List;
 import jakarta.validation.Valid;
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +30,8 @@ public class CartController {
     }
 
     @PostMapping("/addtaco")
-    public Cart addTaco(@RequestBody TacoDTO dto) throws ServiceException {
+    @ResponseStatus(HttpStatus.CREATED)
+    public CartREC addTaco(@RequestBody TacoDTO dto) throws ServiceException {
         return cartService.addTaco(dto);
     }
 
@@ -39,8 +40,20 @@ public class CartController {
     //     return cartService.cartCheckOut(customerId);  
     // }
 
+    // @PostMapping("/checkout")
+    // public ResponseEntity<Void> cartCheckout(@RequestBody OrderDTO dto) throws ServiceException {
+    //     cartService.cartCheckOut(dto);
+    //     return ResponseEntity.ok().build();
+    // }
+
+    // @PostMapping("/checkout")
+    // public ResponseEntity<String> cartCheckout(@RequestBody OrderDTO dto) throws ServiceException {
+    //     cartService.cartCheckOut(dto);
+    //     // return ResponseEntity.status(HttpStatus.CREATED).body("Order created");
+    // }
+
     @PostMapping("/checkout")
-    public Order cartCheckout(@RequestBody OrderDTO dto) throws ServiceException {
-        return cartService.cartCheckOut(dto); 
+    public OrderREC cartCheckout(@RequestBody OrderDTO dto) throws ServiceException {
+        return cartService.cartCheckOut(dto);
     }
 }

@@ -19,7 +19,33 @@ public class CartService {
     private final IngredientRepository ingredientRepository;
     private final OrderRepository orderRepository;
 
-    public Order cartCheckOut(OrderDTO dto) throws ServiceException {
+    public Cart getCart(Integer cartId) throws ServiceException {
+        Cart cart = cartRepository.findById(cartId).get(); 
+        return cart;
+    }
+
+    public Cart getCartByUuid(String uuId) throws ServiceException {
+        return getCartByUUID(uuId); 
+    }
+
+    public CartREC addTaco(TacoDTO dto) throws ServiceException { 
+        int[] ingredients = dto.getIngredients();
+        
+        Taco taco = new Taco();
+        taco.setName(dto.getName());
+        taco.setQty(dto.getQty());
+    
+        for (int i = 0; i < ingredients.length; i++){
+            taco.addIngredient(ingredientRepository.findById(ingredients[i]).get());
+        }
+
+        Cart cart = getCartByUUID(dto.getUuid());
+        cart.addTaco(taco);
+        cart = cartRepository.save(cart);
+        return cartRecord(cart);
+    }
+
+    public OrderREC cartCheckOut(OrderDTO dto) throws ServiceException {
 
         Cart cart = getCartByUUID(dto.getUuid());
 
@@ -58,38 +84,13 @@ public class CartService {
         total = BigDecimal.valueOf(Double.valueOf("4.99")).add(total);
         order.setTotalPrice(total);
 
+        // orderRepository.save(order);
         order = orderRepository.save(order);
         
         // cartRepository.delete(cart);
         cartRepository.deleteById(cart.getId());
 
-        // return orderRecord(order);
-        return order;
-    }
-
-    public Cart getCart(Integer cartId) throws ServiceException {
-        Cart cart = cartRepository.findById(cartId).get(); 
-        return cart;
-    }
-
-    public Cart getCartByUuid(String uuId) throws ServiceException {
-        return getCartByUUID(uuId); 
-    }
-
-    public Cart addTaco(TacoDTO dto) throws ServiceException { 
-        int[] ingredients = dto.getIngredients();
-        
-        Taco taco = new Taco();
-        taco.setName(dto.getName());
-        taco.setQty(dto.getQty());
-    
-        for (int i = 0; i < ingredients.length; i++){
-            taco.addIngredient(ingredientRepository.findById(ingredients[i]).get());
-        }
-
-        Cart cart = getCartByUUID(dto.getUuid());
-        cart.addTaco(taco);
-        return cartRepository.save(cart);
+        return orderRecord(order);
     }
 
     public Cart getCartByUUID(String uuId) {
@@ -111,5 +112,19 @@ public class CartService {
     //         return cartRepository.save(cart);
     //     }
     // }
+
+    public CartREC cartRecord(Cart cart) {
+        return new CartREC(
+            cart.getId(),
+            cart.getUuid()
+        );
+    }
+
+    public OrderREC orderRecord(Order order) {
+        return new OrderREC(
+            order.getId(),
+            order.getUuid()
+        );
+    }
 
 }
