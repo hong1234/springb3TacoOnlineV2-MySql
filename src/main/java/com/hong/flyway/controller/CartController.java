@@ -2,8 +2,10 @@ package com.hong.flyway.controller;
 
 import java.util.List;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.hong.flyway.domain.*;
@@ -30,14 +32,17 @@ public class CartController {
     }
 
     @PostMapping("/addtaco")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CartREC addTaco(@RequestBody TacoDTO dto) throws ServiceException {
-        return cartService.addTaco(dto);
+    // @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<CartREC>  addTaco(@RequestBody TacoDTO dto) throws ServiceException {
+        // return cartService.addTaco(dto);
+        // return ResponseEntity.ok().headers(headers).body("Headers added"); 
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.addTaco(dto));
     }
 
     @PostMapping("/checkout")
-    public OrderREC cartCheckout(@RequestBody OrderDTO dto) throws ServiceException {
-        return cartService.cartCheckOut(dto);
+    public ResponseEntity<OrderREC> cartCheckout(@RequestBody OrderDTO dto) throws ServiceException {
+        // return cartService.cartCheckOut(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.cartCheckOut(dto));
     }
 
     // @GetMapping("/{customerId}/checkout")
@@ -49,12 +54,6 @@ public class CartController {
     // public ResponseEntity<Void> cartCheckout(@RequestBody OrderDTO dto) throws ServiceException {
     //     cartService.cartCheckOut(dto);
     //     return ResponseEntity.ok().build();
-    // }
-
-    // @PostMapping("/checkout")
-    // public ResponseEntity<String> cartCheckout(@RequestBody OrderDTO dto) throws ServiceException {
-    //     cartService.cartCheckOut(dto);
-    //     // return ResponseEntity.status(HttpStatus.CREATED).body("Order created");
     // }
 
 }
