@@ -17,7 +17,7 @@ import com.hong.flyway.domain.*;
 @Service
 public class OrderService {
 
-    // private final TacoRepository tacoRepository; 
+    // private final TacoRepository tacoRepository;  
     // private final IngredientRepository ingredientRepository;
     private final OrderRepository orderRepository;
 
@@ -27,7 +27,13 @@ public class OrderService {
     }
 
     public Order getOrderByUuid(String orderUuid) throws ServiceException {
-        Order order = orderRepository.findByUuid(orderUuid).get(); 
+        // Order order = orderRepository.findByUuid(orderUuid).get(); 
+        // return order;
+        Order order = orderRepository.findByUuid(orderUuid).orElse(new Order());
+        if (order.getId()==null) {
+            order.setId(0);
+            order.setUuid(orderUuid);
+        }
         return order;
     }
 
