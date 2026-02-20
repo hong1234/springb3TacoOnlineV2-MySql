@@ -30,14 +30,35 @@ public class CartService {
 
     public CartREC addTaco(TacoDTO dto) throws ServiceException { 
         int[] ingredients = dto.getIngredients();
+        List<Ingredient> ings = ingredientRepository.findAll();
+
+        // ings.forEach((ing) -> {
+        //     System.out.print(ing.getId());
+        //     System.out.print("-");
+        // });
         
         Taco taco = new Taco();
         taco.setName(dto.getName());
         taco.setQty(dto.getQty());
+        taco.setUnitPrice(BigDecimal.ZERO);
     
         for (int i = 0; i < ingredients.length; i++){
-            taco.addIngredient(ingredientRepository.findById(ingredients[i]).get());
+            for (Ingredient ing : ings) {
+                if (ing.getId() == ingredients[i]) {
+                    taco.addIngredient(ing);
+                    taco.setUnitPrice(ing.getUnitPrice().add(taco.getUnitPrice()));
+                    break;
+                }
+            }
         }
+
+        // for (int i = 0; i < ingredients.length; i++){
+        //     taco.addIngredient(ings.get(ingredients[i] - 1));
+        // }
+
+        // for (int i = 0; i < ingredients.length; i++){
+        //     taco.addIngredient(ingredientRepository.findById(ingredients[i]).get()); 
+        // }
 
         Cart cart = getCartByUUID(dto.getUuid());
         cart.addTaco(taco);
@@ -60,37 +81,53 @@ public class CartService {
 
         Item temp;
         BigDecimal total = BigDecimal.ZERO;
-        BigDecimal ingTotal = BigDecimal.ZERO;
+        BigDecimal sum = BigDecimal.ZERO;
+
         for (Taco taco : cart.getTacos()) {
             
             temp = new Item();
             temp.setName(taco.getName());
             temp.setQty(taco.getQty());
+            temp.setUnitPrice(taco.getUnitPrice());
+            temp.setIngredients(taco.getIngredients());
 
-            for (Ingredient ing : taco.getIngredients()) {
-                temp.addIngredient(ingredientRepository.findById(ing.getId()).get());
-                ingTotal = ing.getUnitPrice().add(ingTotal);
-            }
+            sum = BigDecimal.valueOf(taco.getQty()).multiply(taco.getUnitPrice());
+            temp.setSumPrice(sum);
 
             temp.setOrder(order);
             order.getItems().add(temp);
 
-            total = BigDecimal.valueOf(taco.getQty()).multiply(ingTotal).add(total);
-            ingTotal = BigDecimal.ZERO;
+            // total = BigDecimal.valueOf(taco.getQty()).multiply(taco.getUnitPrice()).add(total);
+            total = sum.add(total);
+            sum = BigDecimal.ZERO;
         }
 
         order.setItemsPrice(total);
 
         total = BigDecimal.valueOf(Double.valueOf("4.99")).add(total);
+
         order.setTotalPrice(total);
 
-        // orderRepository.save(order);
         order = orderRepository.save(order);
         
         // cartRepository.delete(cart);
         cartRepository.deleteById(cart.getId());
 
         return orderRecord(order);
+    }
+
+    public CartREC cartRecord(Cart cart) {
+        return new CartREC(
+            cart.getId(),
+            cart.getUuid()
+        );
+    }
+
+    public OrderREC orderRecord(Order order) {
+        return new OrderREC(
+            order.getId(),
+            order.getUuid()
+        );
     }
 
     public Cart getCartByUUID(String uuId) {
@@ -112,19 +149,5 @@ public class CartService {
     //         return cartRepository.save(cart);
     //     }
     // }
-
-    public CartREC cartRecord(Cart cart) {
-        return new CartREC(
-            cart.getId(),
-            cart.getUuid()
-        );
-    }
-
-    public OrderREC orderRecord(Order order) {
-        return new OrderREC(
-            order.getId(),
-            order.getUuid()
-        );
-    }
 
 }
