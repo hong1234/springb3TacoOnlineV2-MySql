@@ -36,6 +36,19 @@ public class CartService {
 
     public Cart qtyMinus(QtyDTO dto){
         Cart cart =  getCartByUUID(dto.getUuid());
+
+        for (Taco taco : cart.getTacos()) {
+            if(taco.getId().equals(dto.getTacoId())) {
+                if(taco.getQty().equals(1)) {
+                    cart.removeTaco(taco);
+                } else {
+                    taco.setQty(taco.getQty() - 1);
+                }
+                break;
+            }
+        }
+
+        cart = cartRepository.save(cart);
         return cart;
     }
 

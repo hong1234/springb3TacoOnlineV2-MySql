@@ -45,7 +45,7 @@ public class Cart implements Serializable {
   private List<Taco> tacos = new ArrayList<>();
 
   // @ManyToOne
-  // private User user;  
+  // private User user;   
 
   public Cart() {
     // No initialization logic
@@ -57,7 +57,7 @@ public class Cart implements Serializable {
   }
 
   public void removeTaco(Taco taco) {
-    // taco.setCart(null); // ??
+    taco.setCart(null); // ??
     this.tacos.remove(taco);
   }
 
