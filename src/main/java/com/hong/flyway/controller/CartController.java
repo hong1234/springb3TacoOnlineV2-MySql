@@ -21,6 +21,18 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    @PutMapping("/qty")
+    public ResponseEntity<Cart> QtyUpdate(@RequestBody QtyDTO dto) throws ServiceException {
+        String action = dto.getModus();
+        Cart newCart = null;
+        if(action.equals("add")){
+            newCart = cartService.qtyPlus(dto);
+        } else {
+            newCart = cartService.qtyMinus(dto);
+        }
+        return ResponseEntity.ok(newCart);
+    }
+
     // @GetMapping("/{cartId}")
     // public Cart getCart(@PathVariable Integer cartId) throws ServiceException {
     //     return cartService.getCart(cartId); 

@@ -19,6 +19,26 @@ public class CartService {
     private final IngredientRepository ingredientRepository;
     private final OrderRepository orderRepository;
 
+    public Cart qtyPlus(QtyDTO dto){
+        Cart cart =  getCartByUUID(dto.getUuid());
+
+        for (Taco taco : cart.getTacos()) {
+            if(taco.getId().equals(dto.getTacoId())) {
+                taco.setQty(taco.getQty() + 1);
+                break;
+            }
+        }
+
+        cart = cartRepository.save(cart);
+        return cart;
+        // return cartRecord(cart);
+    }
+
+    public Cart qtyMinus(QtyDTO dto){
+        Cart cart =  getCartByUUID(dto.getUuid());
+        return cart;
+    }
+
     public Cart getCart(Integer cartId) throws ServiceException {
         Cart cart = cartRepository.findById(cartId).get(); 
         return cart;
